@@ -57,9 +57,17 @@ qSort1 l@(h:t) = qSort1 menores ++ [h] ++ qSort1 maiores
 
 ---------------------------------------BEST OF THEM------------------------------
 --O quickSort mais compacto e facil de entender! Não é possivel usar em MSets
+--TIPO DE DADOS QUE TRATA:  [Int]
 qSort2 :: Ord a => [a] -> [a]
 qSort2 [] = []
 qSort2 l@(h:t) = qSort2 (filter (<=h) t) ++ [h] ++ qSort2 (filter (>h) t)
+
+
+--Ordenação de MSets com recurso apenas a ordem superior
+--TIPO DE DADOS QUE TRATA:  [(Float,Int)]
+ordena :: Polinomio -> Polinomio
+ordena [] = []
+ordena l@((x,y):xs) = (ordena (filter(\(a,b)->(b<=y)) xs)) ++ [(x,y)] ++ (ordena (filter(\(a,b)->(b>y)) xs))
 
 
 
