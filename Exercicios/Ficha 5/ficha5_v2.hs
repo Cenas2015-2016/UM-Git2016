@@ -97,5 +97,32 @@ digitAlpha l@(x:xs) = (a,b)
 
 --Exercicio 6
 --a)
-zzipWith ::
+zzipWith :: (a->b->c) -> [a] -> [b] -> [c]
+zzipWith func [] _ = []
+zzipWith func _ [] = []
+zzipWith func (a:as) (b:bs) = (func a b):(zzipWith func as bs)
 
+{-
+      max, min, +,-,*,div, mod
+                 |
+                 |
+*Main> zzipWith (-) [8,7,6,55,4] [1,2,3,4]
+[7,5,3,51]
+-}
+
+--b)
+ttakeWhile :: (a->Bool) -> [a] -> [a]
+ttakeWhile func [] = []
+ttakeWhile func (h:t) | ((func h)==True) = h:ttakeWhile func t 
+                      | otherwise = ttakeWhile func t
+
+
+--c)
+ddropWhile :: (a->Bool) -> [a] -> [a]
+ddropWhile func [] = []
+ddropWhile func (h:t) | ((func h)==True) = ddropWhile func t
+                      | otherwise = h:ddropWhile func t
+
+--d)
+sspan :: (a-> Bool) -> [a] -> ([a],[a])
+sspan func l@(h:t) = ((ttakeWhile func l),(ddropWhile func l))
