@@ -70,5 +70,12 @@ ordena [] = []
 ordena l@((x,y):xs) = (ordena (filter(\(a,b)->(b<=y)) xs)) ++ [(x,y)] ++ (ordena (filter(\(a,b)->(b>y)) xs))
 
 
-
+--ISORT - Ordena MSets 
+--TIPO DE DADOS QUE TRATA:  [(Float,Int)]
+ordena :: Polinomio -> Polinomio
+ordena [] = []
+ordena (x:xs) = ins x (ordena xs)
+              where ins x [] = [x]
+                    ins x (b:bs) |(snd x <= snd b) = x : b : bs
+                                 |otherwise = b : (ins x bs)
 
