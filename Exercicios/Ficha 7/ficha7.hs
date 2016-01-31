@@ -9,9 +9,12 @@ data Contacto = Casa Integer
 type Nome = String
 type Agenda = [(Nome,[Contacto])]
 
-minhaAgenda = (("Ricardo",(Casa 883456789,Trab 887654321,Tlm 886549876,"teste@hotmail.com")))
+minhaAgenda = (("Ricardo",(Casa, 883456789,Trab, 887654321,Tlm, 886549876,"teste@hotmail.com")))
                --("Luis",(993456789,99764321,996549876,"tes@hotmail.com")),
                --("Vitor",(773456789,777654321,776549876,"mundo@hotmail.com")))
+ 
+
+
 --a)
 acrescEmail :: Nome -> String -> Agenda -> Agenda
 acrescEmail nome email [] = [(nome,[Email email])]
@@ -100,3 +103,50 @@ listaTuplos (D x y z) ((nome,(D d m a)):xs) = (nome, (calcula (D x y z) (D d m a
 ordenaTuplos :: [(Nome,Int)] -> [(Nome, Int)]
 ordenaTuplos [] = []
 ordenaTuplos l@((a,b):xs) = (ordenaTuplos (filter(\(x,y)->(y<=b)) xs)) ++ [(a,b)] ++ (ordenaTuplos (filter (\(x,y)->(y>b)) xs))
+
+
+
+
+--Exercicio 3
+data Movimento = Credito Float 
+                | Debito Float
+  deriving Show
+
+--data Data = D Int Int Int -- Dia Mes Ano
+--  deriving Show
+
+data Extracto = Ext Float [(Data, String, Movimento)]
+  deriving Show
+
+--na linha a baixo, um exemplo de extrato bancario para testes
+extratoBanc = Ext 100029 [((D 12 10 2102), "repCarro", Credito 9999),((D 20 10 2102), "repCasa", Debito 9339),((D 1 1 2015), "Cenas", Debito 9340)]
+--a)
+extValor :: Extracto -> Float -> [Movimento]
+extValor (Ext _ []) valor = []
+extValor (Ext saldo ((dat, descricao, Credito quantia):ys)) valor | (quantia>=valor) = (Credito quantia):extValor (Ext saldo ys) valor 
+                                                                  | otherwise = extValor (Ext saldo ys) valor 
+
+extValor (Ext saldo ((dat, descricao, Debito quantia):ys)) valor | (quantia>=valor) = (Debito quantia):extValor (Ext saldo ys) valor 
+                                                                 | otherwise = extValor (Ext saldo ys) valor 
+
+
+
+--b)--Nota: Por causa dos tipos, os termos de comparação para criar o tuplo tem que usar o 'elem', pois a simpes comparação com (==) não funciona.
+filtro :: Extracto -> [String] -> [(Data,Movimento)]
+filtro (Ext _ []) descricao= []
+filtro (Ext saldo ((dat,descr,movimento):xs)) descricao | (elem descr descricao) = (dat,movimento):(filtro (Ext saldo xs) descricao) 
+                                                        | otherwise = filtro (Ext saldo xs) descricao
+
+--c)
+creDeb :: Extracto -> (Float,Float)
+creDeb (Ext _ []) = (0,0)
+creDeb (Ext saldo ((_, _, Credito montante):xs)) = let (totalC,totalD) = creDeb (Ext saldo xs) 
+                                                   in (totalC + montante, totalD)
+creDeb (Ext saldo ((_, _, Debito montante):xs)) = let (totalC,totalD) = creDeb (Ext saldo xs) 
+                                                  in (totalC, totalD + montante)
+
+
+--e)
+saldo :: Extracto -> Float
+saldo (Ext saldo []) = saldo
+saldo (Ext saldo movimentos) = let (creditos,debitos) = creDeb (Ext saldo movimentos) in saldo + creditos - debitos
